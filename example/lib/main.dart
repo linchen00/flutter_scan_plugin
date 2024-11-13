@@ -19,6 +19,10 @@ class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   final _flutterScanPlugin = FlutterScanPlugin();
 
+  final List<String> list = <String>[];
+
+  StreamSubscription<String>? streamSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -31,8 +35,7 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion =
-          await _flutterScanPlugin.getPlatformVersion() ?? 'Unknown platform version';
+      platformVersion = await _flutterScanPlugin.getPlatformVersion() ?? 'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -54,8 +57,40 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: FractionallySizedBox(
+          widthFactor: 1,
+          child: Column(
+            children: [
+              Text('Running on: $_platformVersion\n'),
+              ElevatedButton(
+                onPressed: () async {
+                  list.clear();
+                  final startDeviceScanStream = _flutterScanPlugin.startDeviceScanStream();
+                  streamSubscription = startDeviceScanStream.listen((event) {
+                    setState(() {
+                      list.add(event);
+                    });
+                  }, onDone: () {
+                    print("startScanningStream onDone");
+                  });
+                },
+                child: const Text('start Scanning'),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  streamSubscription?.cancel();
+                  streamSubscription = null;
+                },
+                child: const Text('stop Scanning'),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: list.length,
+                  itemBuilder: (context, index) => ListTile(title: Text(list[index])),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

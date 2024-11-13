@@ -4,12 +4,15 @@ import 'package:flutter_scan_plugin/flutter_scan_plugin_platform_interface.dart'
 import 'package:flutter_scan_plugin/flutter_scan_plugin_method_channel.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-class MockFlutterScanPluginPlatform
-    with MockPlatformInterfaceMixin
-    implements FlutterScanPluginPlatform {
-
+class MockFlutterScanPluginPlatform with MockPlatformInterfaceMixin implements FlutterScanPluginPlatform {
   @override
   Future<String?> getPlatformVersion() => Future.value('42');
+
+  @override
+  Stream<int> startDeviceScanStream() {
+    // TODO: implement startScanning
+    throw UnimplementedError();
+  }
 }
 
 void main() {

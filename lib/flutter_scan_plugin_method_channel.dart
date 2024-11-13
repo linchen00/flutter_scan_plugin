@@ -9,9 +9,17 @@ class MethodChannelFlutterScanPlugin extends FlutterScanPluginPlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('flutter_scan_plugin');
 
+  @visibleForTesting
+  final startDeviceScanEventChannel = const EventChannel('flutter_scan_plugin/startScanning');
+
   @override
   Future<String?> getPlatformVersion() async {
     final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
+  }
+
+  @override
+  Stream<String> startDeviceScanStream() {
+    return startDeviceScanEventChannel.receiveBroadcastStream().map((event) => event as String);
   }
 }
